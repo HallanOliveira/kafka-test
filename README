@@ -1,0 +1,5 @@
+Hi, this is a little project about kafka to produce and consume topic messages.
+
+To start, run sudo sh build.sh in the terminal!
+
+Requires Docker and Docker-compose.
