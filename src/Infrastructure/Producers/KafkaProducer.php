@@ -21,7 +21,7 @@ abstract class KafkaProducer
         $conf->set('bootstrap.servers', $brokers);
         $this->producer = new Producer($conf);
         $this->producer->addBrokers($brokers);
-        $this->topic = $this->producer->newTopic(getenv('KAFKA_TOPIC'));
+        $this->topic = $this->producer->newTopic($topic);
     }
 
     protected function produce(string $message): void

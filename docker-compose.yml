@@ -21,6 +21,7 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_CREATE_TOPICS: "test-kafka-1:1:1"
     depends_on:
       - zookeeper
     ports:
@@ -36,3 +37,28 @@ services:
       - app-tier
     volumes:
       - ./:/var/www/html
+
+  php-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - app-tier
+    volumes:
+      - ./:/var/www/html
+    command: php index.php worker:process-notification
+    restart: unless-stopped
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8085:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    depends_on:
+      - kafka
+    networks:
+      - app-tier
+
