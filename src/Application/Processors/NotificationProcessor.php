@@ -9,18 +9,20 @@ use App\Application\Services\NotifyService;
 
 class NotificationProcessor
 {
-    private KafkaConsumer $consumer;
+    protected KafkaConsumer $consumer;
 
     public function __construct(
-        private string $brokers, 
-        private string $topic,
-        private LoggerInterface $logger,
-        private NotifyService $service
+        protected string $brokers, 
+        protected string $topic,
+        protected string $groupId,
+        protected LoggerInterface $logger,
+        protected NotifyService $service,
     )
     {
         $conf = new Conf();
         $conf->set('bootstrap.servers', $brokers);
-        $conf->set('group.id', 'notification-group');
+        $conf->set('group.id', $groupId);
+        $conf->set('auto.offset.reset', 'earliest');
         $this->consumer = new KafkaConsumer($conf);
         $this->topic = $topic;
         $this->consumer->subscribe([$topic]);
@@ -30,7 +32,7 @@ class NotificationProcessor
     {
         while(true) {
             try {
-                $message = $this->consumer->consume(1000);
+                $message = $this->consumer->consume(5000);
                 if (empty($message->payload)) {
                     $this->logger->info('Sem mensagem no tópico.');
                     continue;

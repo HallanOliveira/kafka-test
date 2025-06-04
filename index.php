@@ -12,8 +12,7 @@ foreach ($_ENV as $key => $value) {
     putenv("{$key}={$value}");
 }
 
-if ($argv[1] === 'worker:process-notification') {
-    (NotificationProcessorFactory::create())();
-}
-
-(new NotificationCommand($argv))();
+match (true) {
+    str_starts_with($argv[1], 'worker:') => (NotificationProcessorFactory::create($argv[1]))(),
+    default => (new NotificationCommand($argv))()
+};

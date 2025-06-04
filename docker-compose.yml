@@ -29,10 +29,11 @@ services:
     networks:
       - app-tier
 
-  php:
+  php-cron:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: php-cron
     networks:
       - app-tier
     volumes:
@@ -42,6 +43,19 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: php-worker-1
+    networks:
+      - app-tier
+    volumes:
+      - ./:/var/www/html
+    command: php index.php worker:process-notification-2
+    restart: unless-stopped
+
+  php-worker-2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: php-worker-2
     networks:
       - app-tier
     volumes:
